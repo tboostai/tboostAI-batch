@@ -1,0 +1,83 @@
+{
+  "properties": [
+    {
+      "name": "spring.batch.datasource.url",
+      "type": "java.lang.String",
+      "description": "Description for spring.batch.datasource.url."
+    },
+    {
+      "name": "spring.batch.datasource.username",
+      "type": "java.lang.String",
+      "description": "Description for spring.batch.datasource.username."
+    },
+    {
+      "name": "spring.batch.datasource.password",
+      "type": "java.lang.String",
+      "description": "Description for spring.batch.datasource.password."
+    },
+    {
+      "name": "spring.batch.datasource.driver-class-name",
+      "type": "java.lang.String",
+      "description": "Description for spring.batch.datasource.driver-class-name."
+    },
+    {
+      "name": "EBAY_TOKEN_URL",
+      "type": "java.lang.String",
+      "description": "Description for EBAY_TOKEN_URL."
+    },
+    {
+      "name": "CLIENT_ID",
+      "type": "java.lang.String",
+      "description": "Description for CLIENT_ID."
+    },
+    {
+      "name": "CLIENT_SECRET",
+      "type": "java.lang.String",
+      "description": "Description for CLIENT_SECRET."
+    },
+    {
+      "name": "REFRESH_TOKEN",
+      "type": "java.lang.String",
+      "description": "Description for REFRESH_TOKEN."
+    },
+    {
+      "name": "EBAY_SEARCH_BY_CATEGORY_ID",
+      "type": "java.lang.String",
+      "description": "Description for EBAY_SEARCH_BY_CATEGORY_ID."
+    },
+    {
+      "name": "EBAY_SEARCH_BY_ITEM_ID",
+      "type": "java.lang.String",
+      "description": "Description for EBAY_SEARCH_BY_ITEM_ID."
+    },
+    {
+      "name": "EBAY_CAR_TRUCK_US_CA_CATE_ID",
+      "type": "java.lang.String",
+      "description": "Description for EBAY_CAR_TRUCK_US_CA_CATE_ID."
+    },
+    {
+      "name": "EBAY_HOST",
+      "type": "java.lang.String",
+      "description": "Description for EBAY_HOST."
+    },
+    {
+      "name": "Spring.microserver.service.tboostai.llm.host",
+      "type": "java.lang.String",
+      "description": "Description for Spring.microserver.service.tboostai.llm.host."
+    },
+    {
+      "name": "spring.datasource.jdbc-url",
+      "type": "java.lang.String",
+      "description": "Description for spring.datasource.jdbc-url."
+    },
+    {
+      "name": "spring.batch.datasource.jdbc-url",
+      "type": "java.lang.String",
+      "description": "Description for spring.batch.datasource.jdbc-url."
+    },
+    {
+      "name": "google.api.base-url",
+      "type": "java.lang.String",
+      "description": "Description for google.api.base-url."
+    }
+  ] }

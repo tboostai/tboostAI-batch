@@ -1,0 +1,32 @@
+package com.tboostai_batch.entity.db_model;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import lombok.Data;
+
+import java.io.Serializable;
+
+@Entity
+@Data
+@Table(name = "vehicle_image")
+public class VehicleImageEntity implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long uuid;
+
+    @Column(name = "url", nullable = false, length = 500)
+    private String url;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vehicle_id", nullable = false)
+    @JsonIgnore
+    private VehicleBasicInfoEntity vehicle;
+
+    @Column(name = "width")
+    private double width;
+
+    @Column(name = "height")
+    private double height;
+}
