@@ -19,7 +19,7 @@ public class VehicleImageEntity implements Serializable {
     @Column(name = "url", nullable = false, length = 500)
     private String url;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "vehicle_id", nullable = false)
     @JsonIgnore
     private VehicleBasicInfoEntity vehicle;
@@ -29,4 +29,13 @@ public class VehicleImageEntity implements Serializable {
 
     @Column(name = "height")
     private double height;
+
+    @Override
+    public String toString() {
+        return "VehicleImageEntity{" +
+                "url='" + url + '\'' +
+                ", width=" + width +
+                ", height=" + height +
+                '}';
+    }
 }

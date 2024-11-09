@@ -18,7 +18,7 @@ public class EbayCompleteInfo {
     private Seller seller;
     private List<Tax> tax;
     private VehicleBasicInfo vehicleBasicInfo;
-    private VehicleImage vehicleImage;
+    private List<VehicleImage> vehicleImages;
     private VehiclePostInfo vehiclePostInfo;
     List<VehiclePrice> vehiclePrices;
 }

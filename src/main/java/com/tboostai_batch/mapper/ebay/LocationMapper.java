@@ -16,5 +16,6 @@ public interface LocationMapper {
     Location toLocation(EbayRespLocationDTO ebayRespLocationDTO);
 
     @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "vehicles", ignore = true)
     LocationEntity toLocationEntity(Location location);
 }

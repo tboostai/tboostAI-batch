@@ -3,7 +3,6 @@ package com.tboostai_batch.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.maps.model.LatLng;
-import com.tboostai_batch.component.chunk_components.EbayProductFetchAndProcessItemWriter;
 import com.tboostai_batch.config.GoogleApiConfigProperties;
 import com.tboostai_batch.util.WebClientUtils;
 import jakarta.annotation.Resource;

@@ -54,7 +54,7 @@ public class EbayBatchJobConfig {
                               ProductDetailsComponent productDetailsComponent,
                               EbayProductFetchAndProcessItemReader ebayProductFetchAndProcessItemReader,
                               EbayProductFetchAndProcessItemProcessor ebayProductFetchAndProcessItemProcessor,
-                              EbayProductFetchAndProcessItemWriter ebayProductFetchAndProcessItemWriter, RedisService redisService) {
+                              EbayProductFetchAndProcessItemWriter ebayProductFetchAndProcessItemWriter) {
         this.jobRepository = jobRepository;
         this.transactionManager = transactionManager;
         this.tokenRequestComponent = tokenRequestComponent;
@@ -65,10 +65,10 @@ public class EbayBatchJobConfig {
         this.ebayProductFetchAndProcessItemWriter = ebayProductFetchAndProcessItemWriter;
     }
 
-    @Bean(name = "ebayBatchJob")
+    @Bean(name = "ebayRetrieveVehicleDataBatchJob")
     public Job ebayBatchJob(Step requestTokenStep, Step searchProductsStep, Step searchProductDetailsStep, Step readAndProcessProductDataChunkStep) {
         logger.info("Start building ebay batch job");
-        JobBuilder jobBuilder = new JobBuilder("ebayBatchJob", jobRepository);
+        JobBuilder jobBuilder = new JobBuilder("ebayRetrieveVehicleDataBatchJob", jobRepository);
         SimpleJobBuilder simpleJobBuilder = jobBuilder.start(requestTokenStep)
                 .next(searchProductsStep)
                 .next(searchProductDetailsStep)

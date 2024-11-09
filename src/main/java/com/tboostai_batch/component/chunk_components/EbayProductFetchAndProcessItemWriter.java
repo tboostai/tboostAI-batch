@@ -9,14 +9,22 @@ import com.tboostai_batch.repo.*;
 import com.tboostai_batch.service.RedisService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import static com.tboostai_batch.common.GeneralConstants.EBAY_PLATFORM;
 
 @Component
 public class EbayProductFetchAndProcessItemWriter implements ItemWriter<List<EbayCompleteInfo>> {
@@ -25,6 +33,12 @@ public class EbayProductFetchAndProcessItemWriter implements ItemWriter<List<Eba
     private final RedisService redisService;
     private final MapperManager mapperManager;
     private final RepoManager repoManager;
+    private StepExecution stepExecution;
+
+    @BeforeStep
+    public void setStepExecution(StepExecution stepExecution) {
+        this.stepExecution = stepExecution;
+    }
 
     public EbayProductFetchAndProcessItemWriter(RedisService redisService, MapperManager mapperManager, RepoManager repoManager) {
         this.redisService = redisService;
@@ -70,16 +84,20 @@ public class EbayProductFetchAndProcessItemWriter implements ItemWriter<List<Eba
         VehiclePriceMapper vehiclePriceMapper = mapperManager.getMapper(VehiclePriceMapper.class);
         VehiclePriceRepo vehiclePriceRepo = repoManager.getRepo(VehiclePriceRepo.class);
 
+        VehicleImageMapper vehicleImageMapper = mapperManager.getMapper(VehicleImageMapper.class);
+        VehicleImageRepo vehicleImageRepo = repoManager.getRepo(VehicleImageRepo.class);
+
         // 批量保存集合初始化
         List<AvailabilityEntity> availabilityEntities = new ArrayList<>();
         List<LocationEntity> locationEntities = new ArrayList<>();
-        List<SellerEntity> sellerEntities = new ArrayList<>();
+        Set<SellerEntity> sellerEntities = new HashSet<>();
         List<TaxEntity> allTaxEntities = new ArrayList<>();
         List<VehicleBasicInfoEntity> vehicleBasicInfoEntities = new ArrayList<>();
         List<VehiclePriceEntity> allVehiclePriceEntities = new ArrayList<>();
         List<EbayAdditionalInfoEntity> additionalInfoEntities = new ArrayList<>();
         List<PaymentInfoEntity> allPaymentInfoEntities = new ArrayList<>();
         List<PostEntity> postEntities = new ArrayList<>();
+        List<VehicleImageEntity> allVehicleImageEntities = new ArrayList<>();
 
         // 处理每个 ebayCompleteInfo 实例并收集数据
         for (List<EbayCompleteInfo> list : ebayCompleteInfoList) {
@@ -104,16 +122,27 @@ public class EbayProductFetchAndProcessItemWriter implements ItemWriter<List<Eba
                 }
 
                 // 收集 seller 数据
+                SellerEntity sellerEntity = null;
                 if (ebayCompleteInfo.getSeller() != null) {
-                    SellerEntity sellerEntity = sellerMapper.toSellerEntity(ebayCompleteInfo.getSeller());
-                    sellerEntities.add(sellerEntity);
+                    sellerEntity = sellerMapper.toSellerEntity(ebayCompleteInfo.getSeller());
+                    if (sellerEntities.contains(sellerEntity)) {
+                        // 通过 Stream 找到集合中相等的 sellerEntity，并赋值给 sellerEntity
+                        SellerEntity finalSellerEntity = sellerEntity;
+                        sellerEntity = sellerEntities.stream()
+                                .filter(existingSeller -> existingSeller.equals(finalSellerEntity))
+                                .findFirst() // 找到第一个匹配的元素
+                                .orElse(sellerEntity); // 如果找不到则返回原来的 sellerEntity
+                    } else {
+                        // 如果集合中不包含该 sellerEntity，就将其添加到集合中
+                        sellerEntities.add(sellerEntity);
+                    }
                 }
 
                 // 收集 vehicle 信息和价格
                 if (ebayCompleteInfo.getVehicleBasicInfo() != null) {
                     VehicleBasicInfoEntity vehicleBasicInfoEntity = vehicleInfoMapper.toVehicleBasicInfoEntity(ebayCompleteInfo.getVehicleBasicInfo());
                     vehicleBasicInfoEntity.setLocationEntity(locationEntities.getLast());
-                    vehicleBasicInfoEntity.setSeller(sellerEntities.getLast());
+                    vehicleBasicInfoEntity.setSeller(sellerEntity);
                     vehicleBasicInfoEntities.add(vehicleBasicInfoEntity);
 
                     // 设置 Availability 信息
@@ -126,7 +155,7 @@ public class EbayProductFetchAndProcessItemWriter implements ItemWriter<List<Eba
                     // 收集 price 数据并关联 vehicle
                     if (ebayCompleteInfo.getVehiclePrices() != null) {
                         List<VehiclePriceEntity> vehiclePriceEntities = vehiclePriceMapper.toVehiclePriceEntities(ebayCompleteInfo.getVehiclePrices());
-                        vehiclePriceEntities.forEach(priceEntity -> priceEntity.setVehicle(vehicleBasicInfoEntity));
+                        vehiclePriceEntities.forEach(priceEntity -> priceEntity.setVehicle(vehicleBasicInfoEntities.getLast()));
                         allVehiclePriceEntities.addAll(vehiclePriceEntities);
                     }
                 }
@@ -151,7 +180,7 @@ public class EbayProductFetchAndProcessItemWriter implements ItemWriter<List<Eba
                 if (ebayCompleteInfo.getVehiclePostInfo() != null) {
                     PostEntity postEntity = postInfoMapper.toPostEntity(ebayCompleteInfo.getVehiclePostInfo());
                     if (!sellerEntities.isEmpty()) {
-                        postEntity.setSeller(sellerEntities.getLast());
+                        postEntity.setSeller(sellerEntity);
                         postEntity.setVehicle(vehicleBasicInfoEntities.getLast());
                     }
                     postEntities.add(postEntity);
@@ -166,27 +195,106 @@ public class EbayProductFetchAndProcessItemWriter implements ItemWriter<List<Eba
                     }
                 }
 
+                if (ebayCompleteInfo.getVehicleImages() != null && !ebayCompleteInfo.getVehicleImages().isEmpty()) {
+                    List<VehicleImageEntity> vehicleImageEntities = vehicleImageMapper.toVehicleImageEntityList(ebayCompleteInfo.getVehicleImages());
+                    vehicleImageEntities.forEach(vehicleImageEntity -> vehicleImageEntity.setVehicle(vehicleBasicInfoEntities.getLast()));
+                    if (!vehicleImageEntities.isEmpty()) {
+                        allVehicleImageEntities.addAll(vehicleImageEntities);
+                    }
+                }
+
             }
         }
 
         logger.info("EbayProductFetchAndProcessItemWriter - Total vehicle will be stored in DB: {}", vehicleBasicInfoEntities.size());
-        saveEntities(availabilityEntities, availabilityRepo);
-        saveEntities(locationEntities, locationRepo);
-        saveEntities(sellerEntities, sellerRepo);
-        saveEntities(allTaxEntities, taxRepo);
-        saveEntities(vehicleBasicInfoEntities, vehicleInfoRepo);
-        saveEntities(allVehiclePriceEntities, vehiclePriceRepo);
-        saveEntities(additionalInfoEntities, additionalInfoRepo);
-        saveEntities(allPaymentInfoEntities, paymentInfoRepo);
-        saveEntities(postEntities, postRepo);
-        // 清理 Redis 数据
-        redisService.clearItemDetailsFromRedis();
+        saveEntities(locationEntities, null, locationRepo);
 
+        // Get sellers from DB
+        List<String> sellerUsernames = sellerEntities.stream().map(SellerEntity::getUsername).toList();
+
+        List<SellerEntity> sellersInDB = sellerRepo.findByPlatformAndUsernames(EBAY_PLATFORM, sellerUsernames);
+
+        for (VehicleBasicInfoEntity vehicleBasicInfoEntity : vehicleBasicInfoEntities) {
+            SellerEntity sellerInVehicle = vehicleBasicInfoEntity.getSeller(); // 获取当前 vehicle 的 seller
+
+            if (sellerInVehicle != null) {
+                // 从 sellersInDB 中找到与 vehicle 中 seller 相等的 db 中 seller
+                // 替换为数据库中的 seller 实体
+                sellersInDB.stream()
+                        .filter(dbSeller -> dbSeller.equals(sellerInVehicle))
+                        .findFirst()
+                        .ifPresent(vehicleBasicInfoEntity::setSeller);
+            }
+        }
+        // Save sellers to DB
+        saveEntities(List.copyOf(sellerEntities), sellersInDB, sellerRepo);
+
+
+        saveEntities(allTaxEntities, null, taxRepo);
+        saveEntities(vehicleBasicInfoEntities, null, vehicleInfoRepo);
+        saveEntities(allVehiclePriceEntities, null, vehiclePriceRepo);
+        saveEntities(additionalInfoEntities, null, additionalInfoRepo);
+        saveEntities(allPaymentInfoEntities, null, paymentInfoRepo);
+
+        for (PostEntity postEntity : postEntities) {
+            SellerEntity sellerInPost = postEntity.getSeller(); // 获取当前 vehicle 的 seller
+
+            if (sellerInPost != null) {
+                // 从 sellersInDB 中找到与 vehicle 中 seller 相等的 db 中 seller
+                // 替换为数据库中的 seller 实体
+                sellersInDB.stream()
+                        .filter(dbSeller -> dbSeller.equals(sellerInPost))
+                        .findFirst()
+                        .ifPresent(postEntity::setSeller);
+            }
+        }
+
+        saveEntities(postEntities, null, postRepo);
+        saveEntities(allVehicleImageEntities, null, vehicleImageRepo);
+        saveEntities(availabilityEntities, null, availabilityRepo);
+
+        // Flush redis and store everything in cache as persistent storage
+        redisService.persistCacheToRedis();
+        // Clear all temporary storages
+        redisService.clearAllTempData();
     }
 
-    private <T> void saveEntities(List<T> entities, JpaRepository<T, ?> repository) {
+    private <T> void saveEntities(List<T> entities, List<T> existInDB, JpaRepository<T, ?> jpaRepository) {
         if (entities != null && !entities.isEmpty()) {
-            repository.saveAll(entities);
+
+            // 根据已有数据，区分需要插入和更新的实体
+            List<T> toInsert = new ArrayList<>();
+            if (existInDB != null && !existInDB.isEmpty()) {
+                for (T entity : entities) {
+                    if (!existInDB.contains(entity)) {
+                        toInsert.add(entity);
+                    }
+                }
+            } else {
+                toInsert.addAll(entities);
+            }
+
+            // 分别进行批量插入和更新
+            if (!toInsert.isEmpty()) {
+                try {
+                    jpaRepository.saveAll(toInsert);
+                } catch (DataIntegrityViolationException e) {
+                    logger.error("Data Integrity Violation: {}", e.getMessage());
+                    runWhenFailed(entities);
+                } catch (JpaSystemException e) {
+                    logger.error("JPA System Exception: {}", e.getMessage());
+                    runWhenFailed(entities);
+                } catch (Exception e) {
+                    logger.error("Unexpected Exception: {}", e.getMessage());
+                    runWhenFailed(entities);
+                }
+            }
         }
+    }
+
+    private <T> void runWhenFailed(List<T> entities) {
+        logger.info("Failed entities are :{}", entities);
+        stepExecution.setTerminateOnly();
+        throw new RuntimeException("Batch job terminated due to entity save failure.");
     }
 }

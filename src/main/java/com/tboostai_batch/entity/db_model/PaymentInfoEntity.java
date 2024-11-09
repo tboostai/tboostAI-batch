@@ -23,11 +23,20 @@ public class PaymentInfoEntity implements Serializable {
 
     @Column(name = "payment_method_type", length = 50)
     private String paymentMethodType;
+
     @Column(name = "payment_instructions")
     private String paymentInstructions;
 
     // 一个 PaymentInfo 对应一个 Vehicle
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "vehicle_id", nullable = false)
     private VehicleBasicInfoEntity vehicle;
+
+    @Override
+    public String toString() {
+        return "PaymentInfoEntity{" +
+                "paymentMethodType='" + paymentMethodType + '\'' +
+                ", paymentInstructions='" + paymentInstructions + '\'' +
+                '}';
+    }
 }

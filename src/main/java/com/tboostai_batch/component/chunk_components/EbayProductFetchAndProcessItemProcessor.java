@@ -6,7 +6,6 @@ import com.tboostai_batch.entity.ebay.dto.EbayRespBasicDTO;
 import com.tboostai_batch.entity.inner_model.*;
 import com.tboostai_batch.mapper.ebay.*;
 import com.tboostai_batch.service.LocationLatLngService;
-import com.tboostai_batch.service.VehicleDescriptionService;
 import com.tboostai_batch.service.VehicleInfoMappingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +68,16 @@ public class EbayProductFetchAndProcessItemProcessor implements ItemProcessor<Li
                 vehiclePrice.setPriceType(VehiclePriceEnum.PRICE);
                 vehiclePrices.add(vehiclePrice);
             }
+
+            List<VehicleImage> vehicleImages = new ArrayList<>();
             VehicleImage vehicleImage = mapperManager.getMapper(VehicleImageMapper.class).toVehicleImage(ebayRespBasicDTO.getImage());
+            List<VehicleImage> additionalVehicleImages = mapperManager.getMapper(VehicleImageMapper.class).toVehicleImageList(ebayRespBasicDTO.getAdditionalImages());
+            vehicleImages.add(vehicleImage);
+
+            if (additionalVehicleImages != null && !additionalVehicleImages.isEmpty()) {
+                vehicleImages.addAll(additionalVehicleImages);
+            }
+
 
             // Map data to VehicleBasicInfo
             VehicleBasicInfo vehicleBasicInfo = vehicleInfoMapper.toVehicleBasicInfo(ebayRespBasicDTO);
@@ -88,7 +96,7 @@ public class EbayProductFetchAndProcessItemProcessor implements ItemProcessor<Li
                     .regionIncluded(regionsIncluded)
                     .regionExcluded(regionsExcluded)
                     .vehiclePostInfo(vehiclePostInfo)
-                    .vehicleImage(vehicleImage)
+                    .vehicleImages(vehicleImages)
                     .vehicleBasicInfo(vehicleBasicInfo)
                     .vehiclePrices(vehiclePrices)
                     .build();

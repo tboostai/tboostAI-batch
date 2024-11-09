@@ -79,5 +79,10 @@
       "name": "google.api.base-url",
       "type": "java.lang.String",
       "description": "Description for google.api.base-url."
+    },
+    {
+      "name": "ebay.job.scheduled",
+      "type": "java.lang.String",
+      "description": "Description for ebay.job.enabled."
     }
   ] }

@@ -97,6 +97,7 @@ public class ProductsSearchComponent {
     private void storeItemIdsToRedis(List<String> allItemIds) {
         if (allItemIds != null && !allItemIds.isEmpty()) {
             redisService.storeCurrentBatch(allItemIds);
+            redisService.storeProcessedItems(allItemIds);
         }
     }
 

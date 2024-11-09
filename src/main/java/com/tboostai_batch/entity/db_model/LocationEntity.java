@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Entity
 @Data
@@ -15,18 +16,44 @@ public class LocationEntity implements Serializable {
     @Column(name = "id")
     private Long uuid;
 
-    @Column(length = 100)
+    @Column(name = "country", length = 100)
     private String country;
-    @Column(length = 100)
+
+    @Column(name = "state_province", length = 100)
     private String stateProvince;
-    @Column(length = 100)
+
+    @Column(name = "city", length = 100)
     private String city;
-    @Column(length = 150)
+
+    @Column(name = "street", length = 150)
     private String street;
-    @Column(length = 15, nullable = false)
+
+    @Column(name = "postal_code", length = 15)
     private String postalCode;
-    @Column(length = 10)
+
+    @Column(name = "unit", length = 10)
     private String unit;
+
+    @Column(name = "latitude", nullable = false)
     private double latitude;
+
+    @Column(name = "longitude", nullable = false)
     private double longitude;
+
+    @OneToMany(mappedBy = "locationEntity", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<VehicleBasicInfoEntity> vehicles;
+
+    @Override
+    public String toString() {
+        return "LocationEntity{" +
+                "country='" + country + '\'' +
+                ", stateProvince='" + stateProvince + '\'' +
+                ", city='" + city + '\'' +
+                ", street='" + street + '\'' +
+                ", postalCode='" + postalCode + '\'' +
+                ", unit='" + unit + '\'' +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
+                '}';
+    }
 }

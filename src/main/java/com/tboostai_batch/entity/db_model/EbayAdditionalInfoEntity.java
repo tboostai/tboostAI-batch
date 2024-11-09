@@ -24,7 +24,7 @@ public class EbayAdditionalInfoEntity implements Serializable {
     @Column(name = "item_id", length = 100)
     private String itemId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "vehicle_id", nullable = false)
     private VehicleBasicInfoEntity vehicle;
 
@@ -38,6 +38,15 @@ public class EbayAdditionalInfoEntity implements Serializable {
     @PrePersist
     protected void onCreate() {
         this.createdAt = new Timestamp(System.currentTimeMillis());
+    }
+
+    @Override
+    public String toString() {
+        return "EbayAdditionalInfoEntity{" +
+                "itemId='" + itemId + '\'' +
+                ", additionalInfo='" + additionalInfo + '\'' +
+                ", createdAt=" + createdAt +
+                '}';
     }
 }
 

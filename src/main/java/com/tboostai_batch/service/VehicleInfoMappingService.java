@@ -3,42 +3,26 @@ package com.tboostai_batch.service;
 import com.tboostai_batch.common.VehicleSource;
 import com.tboostai_batch.common.VehicleSpecificsField;
 import com.tboostai_batch.entity.ebay.dto.EbayRespBasicDTO;
-import com.tboostai_batch.entity.ebay.dto.EbayRespImageDTO;
 import com.tboostai_batch.entity.ebay.dto.EbayRespLocalizedAspectDTO;
 import com.tboostai_batch.entity.inner_model.FormattedDescription;
 import com.tboostai_batch.entity.inner_model.VehicleBasicInfo;
-import com.tboostai_batch.mapper.ebay.*;
 import com.tboostai_batch.util.CommonTools;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 
+import static com.tboostai_batch.util.CommonTools.parseBigDecimal;
 import static com.tboostai_batch.util.CommonTools.parseInteger;
 
 @Service
 public class VehicleInfoMappingService {
 
-    private final LocationMapper locationMapper;
-
-    private final VehicleImageMapper vehicleImageMapper;
-
-    private final PaymentInfoMapper paymentInfoMapper;
-
-    private final EbaySellerMapper ebaySellerMapper;
-
-    private final TaxMapper taxMapper;
-
+    private static final Logger logger = LoggerFactory.getLogger(VehicleInfoMappingService.class);
     private final VehicleDescriptionService descriptionService;
 
-    public VehicleInfoMappingService(LocationMapper locationMapper, VehicleImageMapper vehicleImageMapper, PaymentInfoMapper paymentInfoMapper, EbaySellerMapper ebaySellerMapper, TaxMapper taxMapper, VehicleDescriptionService descriptionService) {
-        this.locationMapper = locationMapper;
-        this.vehicleImageMapper = vehicleImageMapper;
-        this.paymentInfoMapper = paymentInfoMapper;
-        this.ebaySellerMapper = ebaySellerMapper;
-        this.taxMapper = taxMapper;
+    public VehicleInfoMappingService(VehicleDescriptionService descriptionService) {
         this.descriptionService = descriptionService;
     }
 
@@ -58,6 +42,8 @@ public class VehicleInfoMappingService {
         CommonTools.setIfNotNull(vehicleBasicInfo::setTransmission, getValueByEnum(localizedAspects, VehicleSpecificsField.TRANSMISSION));
         CommonTools.setIfNotNull(vehicleBasicInfo::setDrivetrain, getValueByEnum(localizedAspects, VehicleSpecificsField.DRIVETRAIN));
         CommonTools.setIfNotNull(vehicleBasicInfo::setEngineType, getValueByEnum(localizedAspects, VehicleSpecificsField.ENGINE_TYPE));
+        CommonTools.setIfNotNull(vehicleBasicInfo::setEngineSize, parseBigDecimal(getValueByEnum(localizedAspects, VehicleSpecificsField.ENGINE_SIZE)));
+        CommonTools.setIfNotNull(vehicleBasicInfo::setEngineInfo, getValueByEnum(localizedAspects, VehicleSpecificsField.ENGINE_INFO));
         CommonTools.setIfNotNull(vehicleBasicInfo::setCylinderInfo, getValueByEnum(localizedAspects, VehicleSpecificsField.CYLINDER_INFO));
         CommonTools.setIfNotNull(vehicleBasicInfo::setWarranty, getValueByEnum(localizedAspects, VehicleSpecificsField.WARRANTY));
         CommonTools.setIfNotNull(vehicleBasicInfo::setDoors, CommonTools.parseInteger(getValueByEnum(localizedAspects, VehicleSpecificsField.DOORS)));
@@ -72,6 +58,8 @@ public class VehicleInfoMappingService {
         }
         vehicleBasicInfo.setCondition(ebayRespBasicDTO.getCondition());
         vehicleBasicInfo.setSourceId(VehicleSource.EBAY.getId());
+
+        logger.info("VehicleInfoMappingService - Current vehicle basic info is {}", vehicleBasicInfo);
     }
 
     // 获取Enum对应的值

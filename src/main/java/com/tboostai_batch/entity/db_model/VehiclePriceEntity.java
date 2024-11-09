@@ -16,7 +16,7 @@ public class VehiclePriceEntity {
     @Column(name = "id")
     private Long uuid;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "vehicle_id", nullable = false)
     private VehicleBasicInfoEntity vehicle;
 
@@ -35,4 +35,14 @@ public class VehiclePriceEntity {
     @Column(name = "price_type")
     @Enumerated(EnumType.ORDINAL)
     private VehiclePriceEnum priceType;
+
+    @Override
+    public String toString() {
+        return "VehiclePriceEntity{" +
+                "price=" + price +
+                ", currency='" + currency + '\'' +
+                ", convertedFromValue=" + convertedFromValue +
+                ", convertedFromCurrency='" + convertedFromCurrency + '\'' +
+                '}';
+    }
 }

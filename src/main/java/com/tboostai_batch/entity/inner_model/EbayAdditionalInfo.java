@@ -1,6 +1,5 @@
 package com.tboostai_batch.entity.inner_model;
 
-import com.tboostai_batch.entity.ebay.dto.EbayRespPriceDTO;
 import lombok.Builder;
 import lombok.Data;
 
@@ -24,10 +23,10 @@ public class EbayAdditionalInfo {
     private Boolean adultOnly;
     private String categoryId;
     private String listingMarketplaceId;
-    private EbayRespPriceDTO currentBidPrice;
+    private VehiclePrice currentBidPrice;
     private Integer bidCount;
     private Boolean reservePriceMet;
-    private EbayRespPriceDTO minimumPriceToBid;
+    private VehiclePrice minimumPriceToBid;
     private Integer uniqueBidderCount;
     private Boolean enabledForGuestCheckout;
     private Boolean eligibleForInlineCheckout;

@@ -18,71 +18,74 @@ public class VehicleBasicInfoEntity implements Serializable {
     @Column(name = "id")
     private Long uuid;
 
-    @Column(length = 50)
+    @Column(name = "make", length = 50)
     private String make;
 
-    @Column(length = 50)
+    @Column(name = "model", length = 50)
     private String model;
 
-    @Column
+    @Column(name = "year")
     private int year;
 
-    @Column(length = 50)
+    @Column(name = "trim", length = 50)
     private String trim;
 
-    @Column(length = 20, unique = true)
+    @Column(name = "vin", length = 20)
     private String vin;
 
-    @Column
+    @Column(name = "mileage")
     private int mileage;
 
-    @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<VehiclePriceEntity> price;
 
-    @Column(length = 10)
+    @Column(name = "exterior_color", length = 50)
     private String exteriorColor;
 
-    @Column(length = 10)
+    @Column(name = "interior_color", length = 50)
     private String interiorColor;
 
-    @Column(length = 15)
+    @Column(name = "body_type", length = 30)
     private String bodyType;
 
-    @Column(length = 10)
+    @Column(name = "engine_type", length = 30)
     private String engineType;
 
-    @Column(precision = 3, scale = 1)
+    @Column(name = "engine_size", precision = 3, scale = 1)
     private BigDecimal engineSize;
 
-    @Column
+    @Column(name = "cylinder")
     private int cylinder;
 
-    @Column(length = 15)
+    @Column(name = "transmission", length = 30)
     private String transmission;
 
-    @Column(length = 30)
+    @Column(name = "drivetrain", length = 50)
     private String drivetrain;
 
-    @ManyToOne(fetch = FetchType.EAGER , cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "location_id")
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "location_id", nullable = false)
     private LocationEntity locationEntity;
 
-    @Column(name = "`condition`",length = 10)
-    private String condition;
+    @Column(name = "vehicle_condition", length = 30)
+    private String vehicleCondition;
 
-    @Column(length = 50)
+    @Column(name = "engine_info", length = 150)
     private String engineInfo;
 
-    @Column(length = 50)
+    @Column(name = "cylinder_info", length = 50)
     private String cylinderInfo;
 
-    @Column(length = 200)
+    @Column(name = "warranty", length = 200)
     private String warranty;
 
-    @Column(length = 20)
+    @Column(name = "vehicle_title", length = 100)
     private String vehicleTitle;
 
+    @Column(name = "capacity")
     private int capacity;
+
+    @Column(name = "doors")
     private int doors;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
@@ -96,33 +99,64 @@ public class VehicleBasicInfoEntity implements Serializable {
     @OneToMany(mappedBy = "vehicle", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VehicleImageEntity> images;
 
-    @Column
+    @Column(name = "listing_date")
     private Timestamp listingDate;
 
-    @Column
+    @Column(name = "source_id")
     private int sourceId;
 
     // 一个车对应一个卖家，卖家可以有多个车
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "seller_id", nullable = false)
     private SellerEntity seller;
 
     // 一个车可以有多个支付信息
-    @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<PaymentInfoEntity> paymentInfos;
 
     // 一个车可以有多个税务信息
-    @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<TaxEntity> taxInfos;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "ai_description", columnDefinition = "TEXT")
     private String aiDescription;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "availability_id", referencedColumnName = "id")
     private AvailabilityEntity availability;
 
+    @Override
+    public String toString() {
+        return "VehicleBasicInfoEntity{" +
+                "make='" + make + '\'' +
+                ", model='" + model + '\'' +
+                ", year=" + year +
+                ", trim='" + trim + '\'' +
+                ", vin='" + vin + '\'' +
+                ", mileage=" + mileage +
+                ", exteriorColor='" + exteriorColor + '\'' +
+                ", interiorColor='" + interiorColor + '\'' +
+                ", bodyType='" + bodyType + '\'' +
+                ", engineType='" + engineType + '\'' +
+                ", engineSize=" + engineSize +
+                ", cylinder=" + cylinder +
+                ", transmission='" + transmission + '\'' +
+                ", drivetrain='" + drivetrain + '\'' +
+                ", vehicleCondition='" + vehicleCondition + '\'' +
+                ", engineInfo='" + engineInfo + '\'' +
+                ", cylinderInfo='" + cylinderInfo + '\'' +
+                ", warranty='" + warranty + '\'' +
+                ", vehicleTitle='" + vehicleTitle + '\'' +
+                ", capacity=" + capacity +
+                ", doors=" + doors +
+                ", listingDate=" + listingDate +
+                ", sourceId=" + sourceId +
+                ", seller=" + seller +
+                ", description='" + description + '\'' +
+                ", aiDescription='" + aiDescription + '\'' +
+                '}';
+    }
 }

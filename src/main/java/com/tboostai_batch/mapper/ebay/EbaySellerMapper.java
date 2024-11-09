@@ -11,6 +11,7 @@ public interface EbaySellerMapper {
     Seller toSeller(EbayRespSellerDTO ebayRespSellerDTO);
 
     @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "vehicles", ignore = true)
     @Mapping(target = "platform", expression = "java(com.tboostai_batch.common.GeneralConstants.EBAY_PLATFORM)")
     SellerEntity toSellerEntity(Seller seller);
 }

@@ -15,5 +15,13 @@ public class VehicleFeatureEntity implements Serializable {
     @Column(name = "id")
     private Long uuid;
 
+    @Column(name = "name")
     private String name;
+
+    @Override
+    public String toString() {
+        return "VehicleFeatureEntity{" +
+                "name='" + name + '\'' +
+                '}';
+    }
 }

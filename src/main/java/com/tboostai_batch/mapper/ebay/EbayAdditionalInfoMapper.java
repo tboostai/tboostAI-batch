@@ -7,7 +7,10 @@ import com.tboostai_batch.entity.inner_model.EbayAdditionalInfo;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(
+        componentModel = "spring",
+        uses = VehiclePriceMapper.class
+)
 public interface EbayAdditionalInfoMapper {
 
     @Mapping(target = "itemId", source = "ebayRespBasicDTO.itemId")

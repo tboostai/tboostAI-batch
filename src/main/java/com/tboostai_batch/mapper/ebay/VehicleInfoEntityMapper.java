@@ -27,6 +27,7 @@ public interface VehicleInfoEntityMapper {
     @Mapping(target = "seller", ignore = true)
     @Mapping(target = "availability", ignore = true)
     @Mapping(target = "features", source = "basicInfo.extractedFeatures")
-    @Mapping(target = "aiDescription", expression = "java(String.join(\", \", basicInfo.getAiDescription()))")
+    @Mapping(target = "aiDescription", expression = "java(java.util.Optional.ofNullable(basicInfo.getAiDescription()).map(list -> String.join(\", \", list)).orElse(\"\"))")
+    @Mapping(target = "vehicleCondition", source = "condition")
     VehicleBasicInfoEntity toVehicleBasicInfoEntity(VehicleBasicInfo basicInfo);
 }
