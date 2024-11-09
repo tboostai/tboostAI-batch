@@ -8,6 +8,7 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +40,7 @@ public class EbayRetrieveVehicleDataBatchService implements JobExecutionListener
         }
     }
 
+    @Async
     public void manualRunEbayJob() {
         runEbayJob();
         logger.info("EbayRetrieveVehicleDataBatchService - Ebay batch Job was ran manually.");

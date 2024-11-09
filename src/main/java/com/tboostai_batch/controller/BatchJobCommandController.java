@@ -4,9 +4,11 @@ import com.tboostai_batch.service.scheduled.EbayRetrieveVehicleDataBatchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController("/command")
+@RestController
+@RequestMapping("/command")
 public class BatchJobCommandController {
 
     private final EbayRetrieveVehicleDataBatchService ebayRetrieveVehicleDataBatchService;

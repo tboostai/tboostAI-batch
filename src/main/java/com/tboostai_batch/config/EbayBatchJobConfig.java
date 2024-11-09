@@ -8,7 +8,6 @@ import com.tboostai_batch.component.chunk_components.EbayProductFetchAndProcessI
 import com.tboostai_batch.component.chunk_components.EbayProductFetchAndProcessItemWriter;
 import com.tboostai_batch.entity.ebay.dto.EbayRespBasicDTO;
 import com.tboostai_batch.entity.inner_model.EbayCompleteInfo;
-import com.tboostai_batch.service.RedisService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
@@ -85,7 +84,7 @@ public class EbayBatchJobConfig {
         return stepBuilder.tasklet((contribution, chunkContext) -> {
             logger.info("Executing Step 1: Requesting Access Token");
             String token = tokenRequestComponent.requestAccessToken();
-
+            logger.info("Token requested from step 1 is {}, will be saved in step context", token);
             // 将 Access Token 存入 JobExecutionContext
             chunkContext.getStepContext().getStepExecution().getJobExecution()
                     .getExecutionContext().put("accessToken", token);
