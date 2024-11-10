@@ -141,13 +141,13 @@ public class EbayProductFetchAndProcessItemWriter implements ItemWriter<List<Eba
                 // 收集 vehicle 信息和价格
                 if (ebayCompleteInfo.getVehicleBasicInfo() != null) {
                     VehicleBasicInfoEntity vehicleBasicInfoEntity = vehicleInfoMapper.toVehicleBasicInfoEntity(ebayCompleteInfo.getVehicleBasicInfo());
-                    vehicleBasicInfoEntity.setLocationEntity(locationEntities.getLast());
+                    vehicleBasicInfoEntity.setLocationEntity(locationEntities.get(locationEntities.size() - 1));
                     vehicleBasicInfoEntity.setSeller(sellerEntity);
                     vehicleBasicInfoEntities.add(vehicleBasicInfoEntity);
 
                     // 设置 Availability 信息
                     if (!availabilityEntities.isEmpty()) {
-                        AvailabilityEntity availabilityEntity = availabilityEntities.getLast();
+                        AvailabilityEntity availabilityEntity = availabilityEntities.get(availabilityEntities.size() - 1);
                         availabilityEntity.setVehicleBasicInfo(vehicleBasicInfoEntity);
                         vehicleBasicInfoEntity.setAvailability(availabilityEntity);
                     }
@@ -155,7 +155,7 @@ public class EbayProductFetchAndProcessItemWriter implements ItemWriter<List<Eba
                     // 收集 price 数据并关联 vehicle
                     if (ebayCompleteInfo.getVehiclePrices() != null) {
                         List<VehiclePriceEntity> vehiclePriceEntities = vehiclePriceMapper.toVehiclePriceEntities(ebayCompleteInfo.getVehiclePrices());
-                        vehiclePriceEntities.forEach(priceEntity -> priceEntity.setVehicle(vehicleBasicInfoEntities.getLast()));
+                        vehiclePriceEntities.forEach(priceEntity -> priceEntity.setVehicle(vehicleBasicInfoEntities.get(vehicleBasicInfoEntities.size() - 1)));
                         allVehiclePriceEntities.addAll(vehiclePriceEntities);
                     }
                 }
@@ -163,7 +163,7 @@ public class EbayProductFetchAndProcessItemWriter implements ItemWriter<List<Eba
                 // 收集 additional info 数据并关联 vehicle
                 if (ebayCompleteInfo.getAdditionalInfo() != null) {
                     EbayAdditionalInfoEntity ebayAdditionalInfoEntity = additionalInfoMapper.toEbayAdditionalInfoEntity(ebayCompleteInfo.getAdditionalInfo());
-                    ebayAdditionalInfoEntity.setVehicle(vehicleBasicInfoEntities.isEmpty() ? null : vehicleBasicInfoEntities.getLast());
+                    ebayAdditionalInfoEntity.setVehicle(vehicleBasicInfoEntities.isEmpty() ? null : vehicleBasicInfoEntities.get(vehicleBasicInfoEntities.size() - 1));
                     additionalInfoEntities.add(ebayAdditionalInfoEntity);
                 }
 
@@ -171,7 +171,7 @@ public class EbayProductFetchAndProcessItemWriter implements ItemWriter<List<Eba
                 if (ebayCompleteInfo.getPaymentInfo() != null) {
                     List<PaymentInfoEntity> paymentInfoEntities = paymentInfoMapper.toPaymentInfoEntities(ebayCompleteInfo.getPaymentInfo());
                     if (!vehicleBasicInfoEntities.isEmpty()) {
-                        paymentInfoEntities.forEach(paymentInfoEntity -> paymentInfoEntity.setVehicle(vehicleBasicInfoEntities.getLast()));
+                        paymentInfoEntities.forEach(paymentInfoEntity -> paymentInfoEntity.setVehicle(vehicleBasicInfoEntities.get(vehicleBasicInfoEntities.size() - 1)));
                     }
                     allPaymentInfoEntities.addAll(paymentInfoEntities);
                 }
@@ -181,7 +181,7 @@ public class EbayProductFetchAndProcessItemWriter implements ItemWriter<List<Eba
                     PostEntity postEntity = postInfoMapper.toPostEntity(ebayCompleteInfo.getVehiclePostInfo());
                     if (!sellerEntities.isEmpty()) {
                         postEntity.setSeller(sellerEntity);
-                        postEntity.setVehicle(vehicleBasicInfoEntities.getLast());
+                        postEntity.setVehicle(vehicleBasicInfoEntities.get(vehicleBasicInfoEntities.size() - 1));
                     }
                     postEntities.add(postEntity);
                 }
@@ -189,7 +189,7 @@ public class EbayProductFetchAndProcessItemWriter implements ItemWriter<List<Eba
                 // 收集 tax 数据并关联 vehicle
                 if (ebayCompleteInfo.getTax() != null) {
                     List<TaxEntity> taxEntities = taxMapper.toTaxEntities(ebayCompleteInfo.getTax());
-                    taxEntities.forEach(taxEntity -> taxEntity.setVehicle(vehicleBasicInfoEntities.getLast()));
+                    taxEntities.forEach(taxEntity -> taxEntity.setVehicle(vehicleBasicInfoEntities.get(vehicleBasicInfoEntities.size() - 1)));
                     if (!taxEntities.isEmpty()) {
                         allTaxEntities.addAll(taxEntities);
                     }
@@ -197,7 +197,7 @@ public class EbayProductFetchAndProcessItemWriter implements ItemWriter<List<Eba
 
                 if (ebayCompleteInfo.getVehicleImages() != null && !ebayCompleteInfo.getVehicleImages().isEmpty()) {
                     List<VehicleImageEntity> vehicleImageEntities = vehicleImageMapper.toVehicleImageEntityList(ebayCompleteInfo.getVehicleImages());
-                    vehicleImageEntities.forEach(vehicleImageEntity -> vehicleImageEntity.setVehicle(vehicleBasicInfoEntities.getLast()));
+                    vehicleImageEntities.forEach(vehicleImageEntity -> vehicleImageEntity.setVehicle(vehicleBasicInfoEntities.get(vehicleBasicInfoEntities.size() - 1)));
                     if (!vehicleImageEntities.isEmpty()) {
                         allVehicleImageEntities.addAll(vehicleImageEntities);
                     }

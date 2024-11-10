@@ -122,7 +122,7 @@ public class EbayBatchJobConfig {
             String token = (String) chunkContext.getStepContext().getStepExecution()
                     .getJobExecution().getExecutionContext().get("accessToken");
             List<EbayRespBasicDTO> ebayRespBasicDTOList = productDetailsComponent.getProductDetails(token);
-            logger.info("There are {} items and the first item is :{}", ebayRespBasicDTOList.size(), ebayRespBasicDTOList.getFirst());
+            logger.info("There are {} items and the first item is :{}", ebayRespBasicDTOList.size(), ebayRespBasicDTOList.get(0));
 
             return RepeatStatus.FINISHED;
         }, transactionManager).build();

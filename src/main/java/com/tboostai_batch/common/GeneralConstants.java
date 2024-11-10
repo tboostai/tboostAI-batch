@@ -24,7 +24,6 @@ public class GeneralConstants {
     public static final String EBAY_HEADER_MARKET_PLACE = "X-EBAY-C-MARKETPLACE-ID";
     public static final String EBAY_SEARCH_API_LIMIT_CALL_MAX = "50";
 
-    // Webclient
     public static final int WEBCLIENT_BUFFER_SIZE = 1024 * 1024; //1MB
 
     public static final String GOOGLE_MAP_API_ADDR = "address";
