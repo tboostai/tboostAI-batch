@@ -13,7 +13,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
-public class EbayRetrieveVehicleDataBatchService implements JobExecutionListener {
+public class EbayRetrieveVehicleDataBatchService implements IEbayRetrieveVehicleDataBatchService, JobExecutionListener {
 
     private static final Logger logger = LoggerFactory.getLogger(EbayRetrieveVehicleDataBatchService.class);
 
@@ -31,7 +31,8 @@ public class EbayRetrieveVehicleDataBatchService implements JobExecutionListener
 
 
     // Run every 2 hours
-    @Scheduled(fixedRate = 7200000)
+    @Scheduled(cron = "0 0 */2 * * *")
+    @Override
     public void scheduledRunEbayJob() {
         if (ebayJobEnabled) {
             runEbayJob();
@@ -40,7 +41,7 @@ public class EbayRetrieveVehicleDataBatchService implements JobExecutionListener
         }
     }
 
-    @Async
+    @Async("asyncExecutor")
     public void manualRunEbayJob() {
         runEbayJob();
         logger.info("EbayRetrieveVehicleDataBatchService - Ebay batch Job was ran manually.");
