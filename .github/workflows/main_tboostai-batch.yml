@@ -60,4 +60,3 @@ jobs:
           app-name: 'tboostai-batch'
           slot-name: 'Production'
           package: '*.jar'
-s w
